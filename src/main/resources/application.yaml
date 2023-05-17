@@ -10,7 +10,6 @@ spring:
     host: smtp.163.com
     port: 465
     username: aimeelina_wu@163.com
-    password:
     protocol: smtps
     properties:
       mail:
