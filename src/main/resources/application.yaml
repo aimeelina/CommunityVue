@@ -23,3 +23,12 @@ Mybatis:
     use-generated-keys: true
     map-underscore-to-camel-case: true
 
+communityvue:
+  path:
+    domain: http://localhost:8080
+
+server:
+  servlet:
+    context-path: /communityvue
+
+
