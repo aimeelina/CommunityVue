@@ -1,5 +1,6 @@
 package com.aimeelina.communityvue.service;
 
+import com.aimeelina.communityvue.entity.Result;
 import com.aimeelina.communityvue.entity.User;
 import com.aimeelina.communityvue.mapper.UserMapper;
 import com.aimeelina.communityvue.utils.MailClient;
@@ -33,16 +34,19 @@ public class UserService {
     public int countUser(){
         return userMapper.getRowsNumber();
     }
-    public Map<String,Object> register(User user){
-        Map<String,Object> map=new HashMap<>();
+    public Result register(User user){
+        //Map<String,Object> map=new HashMap<>();
+        Result result=new Result(200);
         //检查是否有此用户名
         if(userMapper.selectByName(user.getUsername())!=null){
-            map.put("usernameMsg","账号名已存在");
+            result.setCode(400);
+            result.setMessage("账号名已存在");
             //return map;
         }
         //检查是否有此邮箱
         if(userMapper.selectByEmail(user.getEmail())!=null){
-            map.put("emailMsg","邮箱已被注册");
+            result.setCode(400);
+            result.setMessage("邮箱已被注册");
             //return map;
         }
         //加密用户密码
@@ -60,8 +64,8 @@ public class UserService {
         String mailContent=templateEngine.process("MailActive",mailContext);
         mailClient.sendMail(user.getEmail(),"激活账号",mailContent);
 
-
-        return map;
+        result.setMessage("注册成功，请到邮箱点击激活链接");
+        return result;
     }
 
 

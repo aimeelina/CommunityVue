@@ -1,6 +1,7 @@
 package com.aimeelina.communityvue.controller;
 
 import com.aimeelina.communityvue.entity.Result;
+import com.aimeelina.communityvue.entity.User;
 import com.aimeelina.communityvue.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,14 +16,20 @@ public class LoginController {
 
     @Autowired
     private UserService userService;
-    @RequestMapping(path = "/register",method = RequestMethod.GET)
-    public String getRegisterPage(){
-        return "/";
-    }
-    @RequestMapping(path = "/login",method = RequestMethod.POST)
+//    @RequestMapping(path = "/register",method = RequestMethod.GET)
+//    public String getRegisterPage(){
+//        return "/";
+//    }
+    @RequestMapping(path = "/register",method = RequestMethod.POST)
     @ResponseBody
-    public Result valideteUser(@RequestParam("name") String userInfo){
-        System.out.println("userInfo"+userInfo);
-        return new Result(200);
+    public Result register(@RequestParam("username") String username,
+                               @RequestParam("password") String password,
+                               @RequestParam("email") String email){
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(password);
+        user.setEmail(email);
+        System.out.println("userInfo:"+user);
+        return userService.register(user);
     }
 }
