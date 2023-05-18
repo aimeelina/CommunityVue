@@ -26,7 +26,8 @@ Mybatis:
 
 communityvue:
   path:
-    domain: http://localhost:8080
+    back-domain: http://localhost:8080
+    front-domain: http://localhost:8081
 
 server:
   servlet:

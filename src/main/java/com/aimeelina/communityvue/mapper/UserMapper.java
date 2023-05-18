@@ -9,8 +9,8 @@ import java.util.List;
 public interface UserMapper {
 
     User selectById(int id);
-    List<User> selectByName(String name);
-    List<User> selectByEmail(String email);
+    User selectByName(String name);
+    User selectByEmail(String email);
     User selectByPhone(String phone);
     List<User> selectAll(int offSet,int maxLine);
     int insertUser(User user);

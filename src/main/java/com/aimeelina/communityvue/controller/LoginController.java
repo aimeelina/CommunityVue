@@ -32,4 +32,11 @@ public class LoginController {
         System.out.println("userInfo:"+user);
         return userService.register(user);
     }
+
+    @RequestMapping(path = "/activation/{userID}/{code}",method = RequestMethod.GET)
+    @ResponseBody
+    public Result activate(@PathVariable("userID")int userID,@PathVariable("code")String activationCode){
+        return userService.activation(userID,activationCode);
+    }
+
 }
