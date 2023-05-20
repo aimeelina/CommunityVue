@@ -1,7 +1,9 @@
 package com.aimeelina.communityvue.service;
 
+import com.aimeelina.communityvue.entity.LoginTicket;
 import com.aimeelina.communityvue.entity.Result;
 import com.aimeelina.communityvue.entity.User;
+import com.aimeelina.communityvue.mapper.LoginTicketMapper;
 import com.aimeelina.communityvue.mapper.UserMapper;
 import com.aimeelina.communityvue.utils.MailClient;
 import com.aimeelina.communityvue.utils.LoginUtils;
@@ -12,21 +14,20 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class UserService {
     @Autowired
     private UserMapper userMapper;
     @Autowired
+    private LoginTicketMapper loginTicketMapper;
+    @Autowired
     private MailClient mailClient;
     @Autowired
     private TemplateEngine templateEngine;
-    @Value("${communityvue.path.domain}")
-    private String domain;
+    @Value("${communityvue.path.front-domain}")
+    private String frontDomain;
     @Value("${server.servlet.context-path}")
     private String contextPath;
     public List<User> findAllUser(int offSet,int maxLine){
@@ -60,11 +61,11 @@ public class UserService {
         //发送激活邮件
 //        Context mailContext = new Context();
 //        mailContext.setVariable("email",user.getEmail());
-//        String url = front-domain+contextPath+"#/activation/"+user.getId()+"/"+user.getActivationCode();
+        String url = frontDomain+contextPath+"#/activation/"+user.getId()+"/"+user.getActivationCode();
 //        mailContext.setVariable("url",url);
 //        String mailContent=templateEngine.process("MailActive",mailContext);
 //        mailClient.sendMail(user.getEmail(),"激活账号",mailContent);
-
+        System.out.println("激活网址："+url);
         return result;
     }
     public Result activation(int userID, String activationCode){
@@ -89,6 +90,44 @@ public class UserService {
         return result;
     }
 
-
+    public Result login(String username, String password, int expiredSeconds){
+        Result result=new Result(200,"登录成功");
+        if(StringUtils.isBlank(username)){
+            result.setCode(400);
+            result.setMessage("请输入用户名");
+            return result;
+        }
+        if(StringUtils.isBlank(password)){
+            result.setCode(400);
+            result.setMessage("请输入密码");
+            return result;
+        }
+        System.out.println("username is"+username);
+        User user=userMapper.selectByName(username);
+        if(user==null){
+            result.setCode(400);
+            result.setMessage("用户不存在");
+            return result;
+        }
+        if(user.getStatus()==0){
+            result.setCode(400);
+            result.setMessage("账号未激活");
+            return result;
+        }
+        if(!user.getPassword().equals(LoginUtils.md5(password+user.getSalt()))){
+            result.setCode(400);
+            result.setMessage("密码错误");
+            return result;
+        }
+        //登录成功的处理
+        LoginTicket loginTicket=new LoginTicket();
+        loginTicket.setUserId(user.getId());
+        loginTicket.setTicket(LoginUtils.generateUUID());
+        loginTicket.setStatus(0);
+        loginTicket.setExpired(new Date(System.currentTimeMillis()+1000*expiredSeconds));
+        loginTicketMapper.insertLoginTicket(loginTicket);
+        result.setData(loginTicket.getTicket());
+        return result;
+    }
 
 }
