@@ -8,11 +8,13 @@ import com.google.code.kaptcha.Producer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.FastByteArrayOutputStream;
 import org.springframework.web.bind.annotation.*;
 
 import javax.imageio.ImageIO;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
@@ -29,6 +31,8 @@ public class LoginController {
     private UserService userService;
     @Autowired
     private Producer kaptchaProducer;
+    @Value("${communityvue.path.back-domain}")
+    private String backDomain;
 
     @RequestMapping(path = "/register",method = RequestMethod.POST)
     @ResponseBody
@@ -75,7 +79,8 @@ public class LoginController {
     public Result login(@RequestParam("username") String username,
                         @RequestParam("password") String password,
                         @RequestParam("code") String code,
-                        HttpSession session){
+                        HttpSession session,
+                        HttpServletResponse response){
         System.out.println("session:"+session);
         String codeGt = (String) session.getAttribute("kaptcha");
         if(StringUtils.isBlank(code)||!code.equalsIgnoreCase(codeGt)){
@@ -83,7 +88,20 @@ public class LoginController {
             System.out.println("code:"+code);
             return new Result(400,"验证码错误");
         }
-        return userService.login(username,password,3600*12);
+        Result result=userService.login(username,password,3600*12);
+        if(result.getCode()==200){
+            Cookie cookie = new Cookie("ticket",result.getData().toString());
+            cookie.setPath(backDomain);
+            cookie.setMaxAge(3600*12);
+            response.addCookie(cookie);
+        }
+        return result;
+    }
+
+    @RequestMapping(path = "/logout",method = RequestMethod.GET)
+    @ResponseBody
+    public Result logout(@CookieValue("ticket")String ticket){
+        return userService.logout(ticket);
     }
 
 }

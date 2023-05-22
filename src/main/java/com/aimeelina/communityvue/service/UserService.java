@@ -130,4 +130,11 @@ public class UserService {
         return result;
     }
 
+    public Result logout(String ticket){
+        System.out.println("logout ticket: "+ticket);
+        if(StringUtils.isBlank(ticket))return new Result(400,"用户无ticket");
+        loginTicketMapper.updateLoginTicket(ticket,1);
+        return new Result(200,"退出登录");
+    }
+
 }
