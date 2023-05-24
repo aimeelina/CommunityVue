@@ -40,6 +40,10 @@ public class MapperTests {
         System.out.println(userMapper.insertUser(user));
     }
     @Test
+    public void updateHeaderTest(){
+        System.out.println(userMapper.updateHeader(4,"http://images.nowcoder.com/head/641t.png"));
+    }
+    @Test
     public void insertLoginTicketTest(){
         LoginTicket loginTicket=new LoginTicket();
         loginTicket.setUserId(1);
@@ -57,6 +61,7 @@ public class MapperTests {
     public void selectLoginTicketTest(){
         System.out.println(loginTicketMapper.selectLoginTicket("abcde"));
         System.out.println(loginTicketMapper.selectLoginTicket("abc"));
+        System.out.println(loginTicketMapper.selectLoginTicket("01d90ddd4daf4d1ba82a8604a13ecfb0"));
     }
 
 }

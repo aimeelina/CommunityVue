@@ -28,6 +28,7 @@ communityvue:
   path:
     back-domain: http://localhost:8080
     front-domain: http://localhost:8081
+    upload: d:/aimeelina/java_learning/java_projects/upload
 
 server:
   servlet:

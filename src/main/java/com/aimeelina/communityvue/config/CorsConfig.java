@@ -13,7 +13,8 @@ public class CorsConfig {
         corsConfiguration.setAllowCredentials(true);
         // 设置setAllowCredentials = true后就不能设置为*了，要设置具体的
         //corsConfiguration.addAllowedOrigin("http://192.168.0.35:8080");
-        corsConfiguration.addAllowedOrigin("http://localhost:8081");
+        //corsConfiguration.addAllowedOrigin("http://localhost:8081");
+        corsConfiguration.addAllowedOriginPattern("*");
         // 允许任何头
         corsConfiguration.addAllowedHeader("*");
         // 允许任何方法（post、get等）

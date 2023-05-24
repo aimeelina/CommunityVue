@@ -60,12 +60,13 @@ public class LoginController {
         BufferedImage image=kaptchaProducer.createImage(text);
         //将验证码的正确答案存入session
         session.setAttribute("kaptcha",text);
-        System.out.println("session (getKaptcha):"+session);
+        //System.out.println("session (getKaptcha):"+session);
         //将图片传回给前端
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         try {
             // 设置图片的格式
             ImageIO.write(image, "png", stream);
+
         } catch (IOException e) {
             System.out.println("生成验证码响应失败"+e.getMessage());
         }

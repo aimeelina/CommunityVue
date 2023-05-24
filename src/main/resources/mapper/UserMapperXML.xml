@@ -77,6 +77,14 @@
         id=#{id}
     </update>
 
+    <update id="updateHeader" >
+        update user_table
+        set
+        headerUrl=#{headerUrl}
+        where
+        id=#{id}
+    </update>
+
 
 
 </mapper>
