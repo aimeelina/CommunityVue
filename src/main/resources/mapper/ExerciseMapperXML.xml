@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aimeelina.communityvue.mapper.ExerciseMapper">
+
+    <sql id="allAttributes">
+        id, courseId ,chapterId, subChapterId,questionId, question, options, answers, type, imgUrl,pdfUrl,videoUrl
+    </sql>
+
+    <sql id="attributesWoId">
+        courseId ,chapterId, subChapterId,questionId, question, options, answers, type, imgUrl,pdfUrl,videoUrl
+    </sql>
+
+    <select id="selectById" resultType="Exercise">
+        select
+        <include refid="allAttributes"></include>
+        from
+        exercise_table
+        where
+        id=#{id}
+    </select>
+
+    <select id="selectBySubChapterId" resultType="Exercise">
+        select
+        <include refid="allAttributes"></include>
+        from
+        exercise_table
+        where
+        courseId=#{courseId} and chapterId=#{chapterId} and subChapterId=#{subChapterId}
+        limit #{offSet},#{maxLine}
+    </select>
+
+    <insert id="insertExercise" parameterType="Exercise" keyProperty="id">
+        INSERT INTO exercise_table
+        (<include refid="attributesWoId"></include>)
+        VALUES
+        (#{courseId} ,#{chapterId}, #{subChapterId}, #{questionId},#{question}, #{options}, #{answers}, #{type}, #{imgUrl},#{pdfUrl},#{videoUrl})
+    </insert>
+
+    <select id="countQuestionBySubChapterId" resultType="int">
+        select
+        count(id)
+        from
+        exercise_table
+        where
+        courseId=#{courseId} and chapterId=#{chapterId} and subChapterId=#{subChapterId}
+    </select>
+
+    <update id="updateQuestionById" >
+        update exercise_table
+        set
+        question=#{question}
+        where
+        id=#{id}
+    </update>
+
+    <update id="updateOptionsById" >
+        update exercise_table
+        set
+        options=#{options}
+        where
+        id=#{id}
+    </update>
+
+    <update id="updateAnswersById" >
+        update exercise_table
+        set
+        answers=#{answers}
+        where
+        id=#{id}
+    </update>
+
+    <update id="updateImgUrlById" >
+        update exercise_table
+        set
+        imgUrl=#{imgUrl}
+        where
+        id=#{id}
+    </update>
+    <update id="updatePdfUrlById" >
+        update exercise_table
+        set
+        pdfUrl=#{pdfUrl}
+        where
+        id=#{id}
+    </update>
+    <update id="updateVideoUrlById" >
+        update exercise_table
+        set
+        videoUrl=#{videoUrl}
+        where
+        id=#{id}
+    </update>
+
+
+
+
+</mapper>

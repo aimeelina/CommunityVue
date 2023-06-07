@@ -1,5 +1,6 @@
 package com.aimeelina.communityvue.controller;
 
+import com.aimeelina.communityvue.annotation.LoginRequired;
 import com.aimeelina.communityvue.entity.Page;
 import com.aimeelina.communityvue.entity.Result;
 import com.aimeelina.communityvue.entity.User;
@@ -58,9 +59,10 @@ public class HomeController {
         return userService.findAllUser(offset, maxLine);
     }
 
-    @RequestMapping(path = "/uploadHaeder", method = RequestMethod.POST)
+    @LoginRequired
+    @RequestMapping(path = "/uploadHeader", method = RequestMethod.POST)
     @ResponseBody
-    public Result uploadHeader(MultipartFile headerImg) {
+    public Result uploadHeader(@RequestParam("file") MultipartFile headerImg) {
         if (headerImg == null) {
             return new Result(400, "缺少图片");
         }
@@ -75,8 +77,11 @@ public class HomeController {
             throw new RuntimeException(e);
         }
         //注意！存入user的需要是外部访问路径而不是本地路径
-        String savePath = backDomain + contextPath + "/assets/header" + fileName;
+        String savePath = backDomain + contextPath + "/assets/header/" + fileName;
+//        System.out.println("hostHolder.getUser():"+hostHolder.getUser());
         User user = hostHolder.getUser();
+//        System.out.println("savePath："+savePath);
+//        System.out.println("savePath.length():"+savePath.length());
         if (userService.updateHeader(user.getId(), savePath) == 1) {
             return new Result(200, "上传头像成功");
         }
@@ -88,9 +93,10 @@ public class HomeController {
         fileName = uploadPath + "/" + fileName;
         String suffix=fileName.substring(fileName.lastIndexOf(".")+1);
         response.setContentType("image/"+suffix);
-        try {
-            OutputStream os=response.getOutputStream();
-            FileInputStream fis =new FileInputStream(fileName);
+        try (
+                OutputStream os=response.getOutputStream();
+                FileInputStream fis =new FileInputStream(fileName);
+        ){
             byte[] buffer = new byte[1024];
             int b=0;
             while((b= fis.read(buffer))!=-1){

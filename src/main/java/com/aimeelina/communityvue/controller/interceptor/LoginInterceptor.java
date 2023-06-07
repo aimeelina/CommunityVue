@@ -25,9 +25,10 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        System.out.println("运行LoginInterceptor.preHandle");
+//        System.out.println("运行LoginInterceptor.preHandle");
         //从request中获得cookie,再从cookie中查找ticket的值
         String ticket = CookieUtil.getValueFromRequest(request, "ticket");
+//        System.out.println("ticket:"+ticket);
         if (ticket != null) {
             //查数据库得到loginTicket
             LoginTicket loginTicket = userService.getLoginTicket(ticket);
@@ -37,7 +38,8 @@ public class LoginInterceptor implements HandlerInterceptor {
                 User user = userService.findUserById(loginTicket.getUserId());
                 //将user存到hostHolder对象中
                 hostHolder.setUser(user);
-                System.out.println("preHandle在hostHolder里存了user"+user);
+
+//                System.out.println("preHandle在hostHolder里存了user"+user);
             }
         }
         return true;
@@ -61,7 +63,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
 //        HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
-        System.out.println("运行LoginInterceptor.afterCompletion");
+//        System.out.println("运行LoginInterceptor.afterCompletion,清了hostHolder");
         hostHolder.clear();
     }
 
