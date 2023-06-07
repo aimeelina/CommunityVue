@@ -22,6 +22,11 @@ public class StudentService {
     private ExerciseMapper exerciseMapper;
     @Autowired
     private ExerciseAnswerMapper exerciseAnswerMapper;
+    //查看习题
+    public Result getExercises(int courseId, int chapterId ,int subChapterId){
+        Exercise[] exercises = exerciseMapper.selectBySubChapterId(courseId, chapterId, subChapterId, 0, 20);
+        return new Result(200,"获取习题",exercises);
+    }
     //提交习题
     public Result uploadAns(int userId, ExerciseAnswer[] exerciseAnswers){
         for (int i=0;i<exerciseAnswers.length;i++){
@@ -48,14 +53,15 @@ public class StudentService {
     }
     //查询习题记录
     public Result showUserAns(int userId,int[] exerciseIds){
-        String[] resData = new String[exerciseIds.length];
+
+        ExerciseAnswer[] exerciseAnswers=new ExerciseAnswer[exerciseIds.length];
         for(int i=0;i<exerciseIds.length;i++){
             ExerciseAnswer exerciseAnswer = exerciseAnswerMapper.selectByUserIdAndExerciseId(userId, exerciseIds[i]);
             if(exerciseIds!=null){
-                resData[i] = JSON.toJSONString(exerciseAnswer);
+                exerciseAnswers[i] = exerciseAnswer;
             }
         }
-        return new Result(200,"查询习题记录成功",resData);
+        return new Result(200,"查询习题记录成功",exerciseAnswers);
     }
     //查询自己学习情况
     // 申请加入课程
