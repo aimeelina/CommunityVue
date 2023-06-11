@@ -2,6 +2,7 @@ package com.aimeelina.communityvue.service;
 
 import com.aimeelina.communityvue.entity.Exercise;
 import com.aimeelina.communityvue.entity.ExerciseAnswer;
+import com.aimeelina.communityvue.entity.ExerciseDisplay;
 import com.aimeelina.communityvue.entity.Result;
 import com.aimeelina.communityvue.mapper.CourseMapper;
 import com.aimeelina.communityvue.mapper.ExerciseAnswerMapper;
@@ -23,9 +24,78 @@ public class StudentService {
     @Autowired
     private ExerciseAnswerMapper exerciseAnswerMapper;
     //查看习题
-    public Result getExercises(int courseId, int chapterId ,int subChapterId){
+    public Result getExercises(int courseId, int chapterId ,int subChapterId, int userID){
         Exercise[] exercises = exerciseMapper.selectBySubChapterId(courseId, chapterId, subChapterId, 0, 20);
-        return new Result(200,"获取习题",exercises);
+        //将习题处理为前端要求的格式
+        ExerciseDisplay[] eds= new ExerciseDisplay[exercises.length];
+        for (int i=0;i<exercises.length;i++){
+            Exercise exercise=exercises[i];
+            ExerciseDisplay ed=new ExerciseDisplay();
+            ed.setId(exercise.getId());
+            ed.setQuestionId(exercise.getQuestionId());
+            ed.setType(exercise.getType());
+            ed.setQuestion(exercise.getQuestion());
+            if(ed.getType()!=2){//单选或多选
+                String[] options = exercise.getOptions().split("@");
+                ed.setOptionA(options[0]);
+                ed.setOptionB(options[1]);
+                ed.setOptionC(options[2]);
+                ed.setOptionD(options[3]);
+            }
+            //如果用户已提交过答案，则在返回数据中加上用户提交的答案和正确答案
+            ExerciseAnswer exerciseAnswer=exerciseAnswerMapper.selectByUserIdAndExerciseId(userID,exercise.getId());
+            if(exerciseAnswer!=null){
+                ed.setCorrectAnswers(intAnswerToStringAnswer(exercise.getAnswers(),exercise.getType()));
+                ed.setUserAnswers(intAnswerToStringAnswer(exerciseAnswer.getAns(),exercise.getType()));
+                ed.setCorrect(ed.getCorrectAnswers().equals(ed.getUserAnswers()));
+            }
+            eds[i]=ed;
+        }
+        return new Result(200,"获取习题",eds);
+    }
+
+    public String intAnswerToStringAnswer(int intAns,int questionType){
+        if(questionType==0){//单选
+            if(intAns==1){//0001
+                return "A";
+            }
+            if(intAns==2){//0010
+                return "B";
+            }
+            if(intAns==4){//0100
+                return "C";
+            }
+            else{//1000
+                return "D";
+            }
+        }
+        else if(questionType==2){//判断
+            if(intAns==1){//0001
+                return "True";
+            }
+            else{//0010
+                return "False";
+            }
+        }
+        else{//多选
+            StringBuilder res = new StringBuilder(4);
+            if(intAns%2==1){
+                res.append("A");
+            }
+            intAns/=2;
+            if(intAns%2==1){
+                res.append("B");
+            }
+            intAns/=2;
+            if(intAns%2==1){
+                res.append("C");
+            }
+            intAns/=2;
+            if(intAns%2==1){
+                res.append("D");
+            }
+            return res.toString();
+        }
     }
     //提交习题
     public Result uploadAns(int userId, ExerciseAnswer[] exerciseAnswers){

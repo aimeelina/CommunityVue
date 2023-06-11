@@ -1,16 +1,15 @@
 package com.aimeelina.communityvue.entity;
 
 public class ExerciseAnswer {
-    /*
-前端点击节点->根据前端传来的节点序号查找题目->将题目内容&题目id传给前端
-
-点击提交答案->将题目id和答题内容传回来后端->根据题目id对比exercise表的正确答案,并将学生提交的答案存到ExerciseAnswer表
-* */
+/*
+存储用户提交的答案
+用户点击提交->将题目id和作答内容传回来后端->根据题目id对比exercise表的正确答案,并将学生提交的答案存到ExerciseAnswer表
+*/
     private int id;
     private int userId;
     private int exerciseId;
     private int ans;
-    private int score;
+    private int score;//1为正确0为错误
 
     @Override
     public String toString() {

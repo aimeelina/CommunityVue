@@ -43,7 +43,7 @@ public class MapperTests {
     @Test
     public void insertUserTest(){
         User user = new User();
-        user.setUsername("Test");
+        user.setUsername("aaa");
         user.setPassword("123456");
         user.setSalt("abcd");
         System.out.println(userMapper.insertUser(user));
@@ -83,7 +83,7 @@ public class MapperTests {
     @Test
     public void insertCourseTest(){
         Course course=new Course();
-        course.setCourseName("Math");
+        course.setCourseName("Chinese");
         course.setCreatorId(3);
         course.setIntroduction("test course");
         courseMapper.insertCourse(course);
@@ -133,7 +133,7 @@ public class MapperTests {
         exercise.setSubChapterId(1);
         exercise.setQuestionId(1);
         exercise.setQuestion("请问以下哪项正确");
-        exercise.setOptions("@不是这项@是这项@看别的@错的选项");
+        exercise.setOptions("不是这项@是这项@看别的@错的选项");
         exercise.setAnswers(2);
         exercise.setType(0);
         exercise.setCourseId(1);
@@ -143,11 +143,25 @@ public class MapperTests {
         exercise.setSubChapterId(1);
         exercise.setQuestionId(2);
         exercise.setQuestion("请问以下哪项错误");
-        exercise.setOptions("@不是这项@看别的@是这项@错的选项");
+        exercise.setOptions("不是这项@看别的@是这项@错的选项");
         exercise.setAnswers(4);
         exercise.setType(0);
         exercise.setCourseId(1);
         exerciseMapper.insertExercise(exercise);
+    }
+    @Test
+    public void insertExerciseTest2(){
+        Exercise exercise=new Exercise();
+        exercise.setChapterId(1);
+        exercise.setSubChapterId(1);
+        exercise.setQuestionId(8);
+        exercise.setQuestion("请问以下哪项正确8");
+        exercise.setOptions("不是这项@是这项@看别的@错的选项(AB)");
+        exercise.setAnswers(3);
+        exercise.setType(1);
+        exercise.setCourseId(1);
+        exerciseMapper.insertExercise(exercise);
+
     }
     @Test
     public void ExerciseSelectBySubChapterIdTest(){
