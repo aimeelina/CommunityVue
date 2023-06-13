@@ -1,31 +1,67 @@
 package com.aimeelina.communityvue.controller;
 
-import com.aimeelina.communityvue.annotation.LoginRequired;
+import com.aimeelina.communityvue.entity.ExerciseAnswer;
+import com.aimeelina.communityvue.entity.ExerciseDisplay;
 import com.aimeelina.communityvue.entity.Result;
 import com.aimeelina.communityvue.entity.User;
 import com.aimeelina.communityvue.service.StudentService;
 import com.aimeelina.communityvue.utils.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
+@CrossOrigin
 public class ExerciseController {
     @Autowired
-    private HostHolder hostHolder;
-    @Autowired
     private StudentService studentService;
-    @LoginRequired
-    @RequestMapping(value = "/getExercise/{courseId}/{chapterId}/{subChapterId}",method = RequestMethod.GET)
+    @Autowired
+    private HostHolder hostHolder;
+
+    @RequestMapping("/getExercise/{courseId}/{chapterId}/{subChapterId}")
     @ResponseBody
-    public Result getExercises(@PathVariable("courseId") int courseId,
-                               @PathVariable("chapterId") int chapterId,
-                               @PathVariable("subChapterId") int subChapterId){
-        //后续可能要加一个判断用户有没有购买该课程的功能
+    public Result getExercises(@PathVariable("courseId")int courseId,
+                               @PathVariable("chapterId")int chapterId,
+                               @PathVariable("subChapterId")int subChapterId){
         User user = hostHolder.getUser();
-        return studentService.getExercises(courseId,chapterId,subChapterId,user.getId());
+        if (user != null) {
+            return studentService.getExercises(courseId,chapterId,subChapterId,user.getId());
+        }
+        else {
+            return new Result(400,"用户未登录，无法获取习题内容");
+        }
+    }
+
+//    @RequestMapping(value = "/submitExercise",method = RequestMethod.POST)
+//    @ResponseBody
+//    public Result getExercises( @RequestBody List<ExerciseDisplay> exerciseDisplays){
+//        User user = hostHolder.getUser();
+//        if (user != null) {
+////            return studentService.getExercises(courseId,chapterId,subChapterId,user.getId());
+//            for (int i=0;i<exerciseDisplays.size();i++) System.out.println("ed"+i+":"+exerciseDisplays.get(i));
+//            return new Result(222,"用户未登录，无法提交习题内容");
+//        }
+//        else {
+//            return new Result(400,"用户未登录，无法提交习题内容");
+//        }
+//    }
+
+    @RequestMapping(value = "/submitExercise",method = RequestMethod.POST)
+    @ResponseBody
+    public Result getExercises(@RequestBody List<ExerciseAnswer> exerciseAnswers){
+        User user = hostHolder.getUser();
+        if (user != null) {
+            for (int i=0;i<exerciseAnswers.size();i++){
+//                System.out.println("ed"+i+":"+exerciseAnswers.get(i));
+                exerciseAnswers.get(i).setUserId(user.getId());
+            }
+            ExerciseAnswer[] exerciseAnswerArray=exerciseAnswers.toArray(new ExerciseAnswer[exerciseAnswers.size()]);
+            return studentService.uploadAns(exerciseAnswerArray);
+        }
+        else {
+            return new Result(400,"用户未登录，无法提交习题内容");
+        }
     }
 }

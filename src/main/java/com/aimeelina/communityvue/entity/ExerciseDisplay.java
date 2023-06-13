@@ -1,7 +1,7 @@
 package com.aimeelina.communityvue.entity;
 
 public class ExerciseDisplay {
-    private int id;
+    private int id;//exerciseId
     private int questionId;
     private String question;
     private String optionA;

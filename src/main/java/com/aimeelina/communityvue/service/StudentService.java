@@ -7,6 +7,7 @@ import com.aimeelina.communityvue.entity.Result;
 import com.aimeelina.communityvue.mapper.CourseMapper;
 import com.aimeelina.communityvue.mapper.ExerciseAnswerMapper;
 import com.aimeelina.communityvue.mapper.ExerciseMapper;
+import com.aimeelina.communityvue.utils.UtilFuncs;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +46,8 @@ public class StudentService {
             //如果用户已提交过答案，则在返回数据中加上用户提交的答案和正确答案
             ExerciseAnswer exerciseAnswer=exerciseAnswerMapper.selectByUserIdAndExerciseId(userID,exercise.getId());
             if(exerciseAnswer!=null){
-                ed.setCorrectAnswers(intAnswerToStringAnswer(exercise.getAnswers(),exercise.getType()));
-                ed.setUserAnswers(intAnswerToStringAnswer(exerciseAnswer.getAns(),exercise.getType()));
+                ed.setCorrectAnswers(UtilFuncs.intAnswerToStringAnswer(exercise.getAnswers(),exercise.getType()));
+                ed.setUserAnswers(UtilFuncs.intAnswerToStringAnswer(exerciseAnswer.getAns(),exercise.getType()));
                 ed.setCorrect(ed.getCorrectAnswers().equals(ed.getUserAnswers()));
             }
             eds[i]=ed;
@@ -54,55 +55,13 @@ public class StudentService {
         return new Result(200,"获取习题",eds);
     }
 
-    public String intAnswerToStringAnswer(int intAns,int questionType){
-        if(questionType==0){//单选
-            if(intAns==1){//0001
-                return "A";
-            }
-            if(intAns==2){//0010
-                return "B";
-            }
-            if(intAns==4){//0100
-                return "C";
-            }
-            else{//1000
-                return "D";
-            }
-        }
-        else if(questionType==2){//判断
-            if(intAns==1){//0001
-                return "True";
-            }
-            else{//0010
-                return "False";
-            }
-        }
-        else{//多选
-            StringBuilder res = new StringBuilder(4);
-            if(intAns%2==1){
-                res.append("A");
-            }
-            intAns/=2;
-            if(intAns%2==1){
-                res.append("B");
-            }
-            intAns/=2;
-            if(intAns%2==1){
-                res.append("C");
-            }
-            intAns/=2;
-            if(intAns%2==1){
-                res.append("D");
-            }
-            return res.toString();
-        }
-    }
+
     //提交习题
-    public Result uploadAns(int userId, ExerciseAnswer[] exerciseAnswers){
+    public Result uploadAns(ExerciseAnswer[] exerciseAnswers){
         for (int i=0;i<exerciseAnswers.length;i++){
             int exerciseId = exerciseAnswers[i].getExerciseId();
             //判断学生是否已经提交过该题的答案
-            if(exerciseAnswerMapper.selectByUserIdAndExerciseId(userId,exerciseId)!=null){
+            if(exerciseAnswerMapper.selectByUserIdAndExerciseId(exerciseAnswers[i].getUserId(),exerciseId)!=null){
                 continue;
             }
             //查Exercise表对答案
